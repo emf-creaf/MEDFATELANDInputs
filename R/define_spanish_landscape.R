@@ -118,7 +118,7 @@ define_spanish_landscape <- function(emf_dataset_path,
     int_target <- sf::st_intersection(sf_mfe_prov, target_polygon) |>
       na.omit()
     sf_mfe_target_list[[i]] <- int_target[as.character(sf::st_geometry_type(int_target)) %in% c("POLYGON", "MULTIPOLYGON"), , drop = FALSE]
-    if(verbose) cli::cli_progress_step(paste0("Added ", nrow(int_buffer)," MFE polygons from province ", prov))
+    if(verbose) cli::cli_progress_step(paste0("Added ", nrow(int_target)," MFE polygons and ", nrow(int_buffer)," buffer MFE polygons from province ", prov))
     
   }
   rm(sf_mfe_prov)
@@ -139,7 +139,9 @@ define_spanish_landscape <- function(emf_dataset_path,
       if(fit_raster_extent) target_raster <- terra::crop(target_raster, terra::ext(sf_mfe_target_vect))
     }
     if(verbose) cli::cli_progress_step(paste0("Create sf object with forest locations at pixel locations"))
-    sf_out <- terra::intersect(terra::as.points(target_raster), sf_mfe_target_vect) |>
+    sf_out <- target_raster |> 
+      terra::as.points() |>
+      terra::intersect(sf_mfe_target_vect) |>
       sf::st_as_sf()
     sf_out <- sf_out[,"geometry", drop = FALSE]
     rm(sf_mfe_target_vect)
@@ -152,11 +154,15 @@ define_spanish_landscape <- function(emf_dataset_path,
       if(fit_raster_extent) target_raster <- terra::crop(target_raster, terra::ext(target_polygon_vect))
     }
     if(verbose) cli::cli_progress_step(paste0("Create sf object with locations at pixel locations"))
-    sf_out <- terra::intersect(terra::as.points(target_raster), target_polygon_vect) |>
+    sf_out <- target_raster |> 
+      terra::as.points() |>
+      terra::intersect(target_polygon_vect) |>
       sf::st_as_sf()
     sf_out <- sf_out[,"geometry", drop = FALSE]
   }
-  
+  ggplot(target_polygon)+
+    geom_sf()+
+    geom_sf(data = sf_out, size = 0.1)
   if(verbose) cli::cli_progress_step(paste0("Add topography to sf (and filter locations with missing topography)"))
   dem <- NULL
   for(prov in touched_provinces) {

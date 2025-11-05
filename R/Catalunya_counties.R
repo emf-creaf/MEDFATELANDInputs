@@ -1,7 +1,7 @@
 source("R/define_spanish_landscape.R")
 
 
-res <- 200
+res <- 100
 buffer_dist <- 5000
 emf_dataset_path <- "~/datasets/"
 test_plots <- TRUE
