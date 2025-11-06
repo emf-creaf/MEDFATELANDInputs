@@ -160,9 +160,7 @@ define_spanish_landscape <- function(emf_dataset_path,
       sf::st_as_sf()
     sf_out <- sf_out[,"geometry", drop = FALSE]
   }
-  ggplot(target_polygon)+
-    geom_sf()+
-    geom_sf(data = sf_out, size = 0.1)
+  
   if(verbose) cli::cli_progress_step(paste0("Add topography to sf (and filter locations with missing topography)"))
   dem <- NULL
   for(prov in touched_provinces) {

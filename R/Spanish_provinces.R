@@ -3,13 +3,13 @@ source("R/define_spanish_landscape.R")
 # Top parameters
 emf_dataset_path <- "~/datasets/"
 test_plots <- TRUE
-res <- 500
+res <- 1000
 buffer_dist <- 50000
 
 # Provinces to process
 provinces <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
                as.character(11:50))
-provinces <- sample(provinces)
+# provinces <- sample(provinces)
 
 # Common raster for provinces (res = 500 m)
 raster_platon_specs <- readRDS("data-raw/penbal_platon_specs.rds")
@@ -28,8 +28,8 @@ if((res %% res_raster)==0) { # If res is a multiple of res_raster, then aggregat
 
 # Province loop
 for(province_code in provinces) {
-  out_sf <- paste0("data/provinces_",res,"m/medfateland_", province_code, "_sf_", res,"m.rds")
-  output_tif <- paste0("data/provinces_", res, "m/medfateland_", province_code, "_raster_",res,"m.tif")
+  out_sf <- paste0("data/spain_forests_provinces_",res,"m/medfateland_", province_code, "_sf_", res,"m.rds")
+  output_tif <- paste0("data/spain_forests_provinces_", res, "m/medfateland_", province_code, "_raster_",res,"m.tif")
   if(!file.exists(out_sf)) {
     cli::cli_h1(paste0("Processing province: ", province_code))
     
