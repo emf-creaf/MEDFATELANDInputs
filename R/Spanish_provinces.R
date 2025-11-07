@@ -3,13 +3,13 @@ source("R/define_spanish_landscape.R")
 # Top parameters
 emf_dataset_path <- "~/datasets/"
 test_plots <- TRUE
-res <- 1000
+res <- 500
 buffer_dist <- 50000
 
 # Provinces to process
 provinces <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
                as.character(11:50))
-# provinces <- sample(provinces)
+provinces <- sample(provinces)
 
 # Common raster for provinces (res = 500 m)
 raster_platon_specs <- readRDS("data-raw/penbal_platon_specs.rds")
