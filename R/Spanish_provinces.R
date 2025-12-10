@@ -3,8 +3,17 @@ source("R/define_spanish_landscape.R")
 # Top parameters
 emf_dataset_path <- "~/datasets/"
 test_plots <- TRUE
+meteo_match <- TRUE # Checks that coordinates match interpolated meteo object
 res <- 500
 buffer_dist <- 50000
+
+if(meteo_match) {
+  # Copied from "data-emf.creaf.cat:/srv/emf_data/fileserver/gpkg/daily_interpolated_meteo
+  sf_meteo <- sf::st_read("data-raw/20251204.gpkg")
+  sf_meteo_cc <- sf::st_geometry(sf_meteo) |>
+    sf::st_coordinates()
+  sf_meteo_cc_string <- paste0(sf_meteo_cc[,1],"_",sf_meteo_cc[,2])
+}
 
 # Provinces to process
 provinces <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
@@ -60,7 +69,17 @@ for(province_code in provinces) {
                                   biomass_correction = biomass_correction, 
                                   ifn_imputation_source = ifn_imputation_source)
 
-    # Store sf object and raster    
+    # Filters coordinates that do not match meteo data (peninsular spain)
+    if(meteo_match && !(province_code %in% c("35", "38"))) {
+      cc <-sf::st_geometry(l$sf) |>
+        sf::st_coordinates()
+      cc_string <- paste0(cc[,1],"_",cc[,2])
+      sel <- cc_string %in% sf_meteo_cc_string
+      print(table(sel))
+      l$sf <- l$sf[sel, , drop= FALSE]
+    }
+    
+    # Store filtered sf object and raster    
     saveRDS(dplyr::as_tibble(l$sf), file = out_sf)
     terra::writeRaster(l$r, filename=output_tif, overwrite = TRUE)
     
